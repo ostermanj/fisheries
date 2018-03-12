@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><!-- HT heavily https://bost.ocks.org/mike/miserables/ -->
+<meta charset="utf-8">
+<title>Fisheries Matrix</title>
+<style>
+
+.background {
+  fill: #eee;
+}
+
+line {
+  stroke: #fff;
+}
+
+text.active {
+  fill: black;
+  font-weight:bold;
+}
+
+text {
+  font-size: 7px;
+  fill:#767676;
+}
+
+</style>
+<script src="//d3js.org/d3.v2.min.js" charset="utf-8"></script>
+
+<aside style="margin-top:20px;margin-left:60px;">
+<p>Order: <select id="order">
+  <option value="cluster">by cluster</option>
+  <option value="name">by name</option>
+  <option value="count">by permit count</option>
+</select>
+</aside>
+
+<script src="scripts.js"></script>
