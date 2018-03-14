@@ -22,14 +22,29 @@ text {
   fill:#767676;
 }
 
+select.has-error {
+    border-color: red;
+    border-width: 2px;
+    opacity: 0.5;
+}
+
 </style>
 <script src="//d3js.org/d3.v2.min.js" charset="utf-8"></script>
 
 <aside style="margin-top:20px;margin-left:60px;">
-<p>Order: <select id="order">
-  <option value="cluster">by cluster</option>
-  <option value="name">by name</option>
-  <option value="count">by permit count</option>
+<p>Order by <select id="order1">
+  <option value="cluster">cluster</option>
+  <option value="species">species</option>
+  <option value="count">permit count</option>
+  <option value="area">area</option>
+  <option value="gear">gear</option>
+</select>
+  then by <select id="order2">
+  <option value="species">species</option>
+  <option value="count">permit count</option>
+  <option value="area">area</option>
+  <option value="gear">gear</option>
+  <option disabled value="cluster">cluster</option>
 </select>
 </aside>
 

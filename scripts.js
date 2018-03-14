@@ -99,15 +99,21 @@ function render(network) {
   });
 
   console.log(matrix);
-  // Precompute the orders.
-  var orders = {
-    name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].index, nodes[b].index); }),
-    count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
-    cluster: d3.range(n).sort(function(a, b) { return nodes[a].cluster - nodes[b].cluster; })
-  };
+
+  function setOrder(primary,secondary){
+    function returnOrder(field){
+      if ( field === 'count'){
+        return d3.descending;
+      } else {
+        return d3.ascending;
+      }
+    }
+    return d3.range(n).sort(function(a, b) { return returnOrder(primary)(nodes[a][primary], nodes[b][primary]) || returnOrder(secondary)(nodes[a][secondary], nodes[b][secondary]);});
+  }
+  
 
   // The default sort order.
-  x.domain(orders.cluster);
+  x.domain(setOrder('cluster','species'));
 
   svg.append("rect")
       .attr("class", "background")
@@ -170,13 +176,25 @@ function render(network) {
     d3.selectAll("text").classed("active", false);
   }
 
-  d3.select("#order").on("change", function() {
-    
-    order(this.value);
-  });
+  d3.select("#order1").on("change", reorder);
+  d3.select("#order2").on("change", reorder);
 
-  function order(value) {
-    x.domain(orders[value]);
+  function reorder() {
+    var v1 = d3.select("#order1").node().value;
+    var v2 = d3.select("#order2").node().value;
+    console.log(v1,v2);
+    d3.selectAll("#order2 option[disabled]").attr('disabled', null); 
+    d3.select("#order2 option[value=" + v1 + ']').attr('disabled',true);
+    if ( v1 === v2 ){
+      d3.select("#order2").classed('has-error',true); 
+    } else {
+      d3.select("#order2").classed('has-error',false);
+    }
+    order(v1, v2);
+  }
+
+  function order(v1,v2) {
+    x.domain(setOrder(v1,v2));
 
     var t = svg.transition().duration(2500);
 
