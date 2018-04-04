@@ -1,3 +1,33 @@
+var species = {
+  B: "Halibut",
+  C: "Sablefish",
+  D: "Dungeness crab",
+  E: "Hair Crab",
+  F: "Freshwater fish",
+  G: "Herring roe",
+  H: "Herring (food/bait)",
+  I: "Ling cod",
+  J: "Geoduck clams",
+  K: "King crab",
+  L: "Herring spawn on kelp",
+  M: "Misc. saltwater finfish",
+  N: "Snails",
+  O: "Octopus/squid",
+  P: "Shrimp",
+  Q: "Sea cucumber",
+  R: "Clams",
+  S: "Salmon",
+  T: "Tanner crab",
+  TB: "Tanner Bairdi crab",
+  U: "Sea urchin",
+  W: "Scallops",
+  Y: "Rockfish"
+};
+
+var gear = {"1":"PURSE SEINE","2":"VESSEL TO 80'","4":"SET GILLNET","5":"HAND TROLL","6":"LONGLINE VESSEL UNDER 60'","7":"OTTER TRAWL","8":"FISH WHEEL","9":"POT GEAR VESSEL UNDER 60'","10":"RING NET","11":"DIVING GEAR","12":"DIVE/HAND PICK","17":"BEAM TRAWL","18":"SHOVEL","21":"POUND","23":"MECHANICAL DIGGER","25":"DINGLEBAR TROLL","26":"MECHANICAL JIG","34":"GILLNET","37":"PAIR TRAWL","61":"LONGLINE VESSEL 60' OR OVER","77":"GILLNET","91":"POT GEAR VESSEL 60' OR OVER"};
+
+var regions = {"A":"SOUTHEAST","B":"STATEWIDE","D":"YAKUTAT","E":"PRINCE WILLIAM SOUND","J":"WESTWARD","L":"CHIGNIK","M":"ALASKA PENINSULA","Q":"BERING SEA","T":"BRISTOL BAY","X":"KOTZEBUE","H":"COOK INLET","S":"SECURITY COVE","V":"CAPE AVINOF","Z":"NORTON SOUND","K":"KODIAK","O":"DUTCH HARBOR","OA":"ALEUTIAN CDQAPICDA","OB":"ALEUTIAN CDQBBEDC","OC":"ALEUTIAN CDQCBSFA","OD":"ALEUTIAN CDQCVRF","OE":"ALEUTIAN CDQNSEDC","OF":"ALEUTIAN CDQYDFDA","OG":"ALEUTIAN ISLANDS ACAACDC","QA":"BERING SEA CDQAPICDA","QB":"BERING SEA CDQBBEDC","QC":"BERING SEA CDQCBSFA","QD":"BERING SEA CDQCVRF","QE":"BERING SEA CDQNSEDC","QF":"BERING SEA CDQYDFDA","TA":"BRISTOL BAY CDQAPICDA","TB":"BRISTOL BAY CDQBBEDC","TC":"BRISTOL BAY CDQCBSFA","TD":"BRISTOL BAY CDQCVRF","TE":"BRISTOL BAY CDQNSEDC","TF":"BRISTOL BAY CDQYDFDA","ZE":"NORTON SOUND CDQNSEDC","ZF":"NORTON SOUND CDQYDFDA","G":"GOA","AB":"STATEWIDE","AG":"GOA","BB":"STATEWIDE","BG":"GOA","FB":"STATEWIDE","FG":"GOA","GB":"STATEWIDE","GG":"GOA","HB":"STATEWIDE","HG":"GOA","IB":"STATEWIDE","IG":"GOA","F":"ATKA/AMLIA ISLANDS","R":"ADAK","AFW":"FEDERAL WATERS","ASW":"STATE WATERS","BFW":"FEDERAL WATERS","BSW":"STATE WATERS"};
+
 var margin = {top: 30, right: 0, bottom: 10, left: 60},
     width = 850,
     height = 850;
@@ -87,7 +117,7 @@ function render(network) {
     node.count = 0;
     matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
   });
-
+  console.log(matrix);
   // Convert links to matrix; count character occurrences.
   network.links.forEach(function(link) {
     matrix[link.source][link.target].z += link.value;
@@ -135,7 +165,7 @@ function render(network) {
       .attr("y", x.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "end")
-      .text(function(d, i) { return nodes[i].name; });
+      .text(function(d, i) { return i + '. ' + nodes[i].name; });
 
   var column = svg.selectAll(".column")
       .data(matrix)
@@ -147,7 +177,7 @@ function render(network) {
       .attr("x1", -width);
 
   column.append("text")
-      .attr("x", 6)
+      .attr("x", 2)
       .attr("y", x.rangeBand() / 2)
       .attr("dy", ".32em")
       .attr("text-anchor", "start")
@@ -192,68 +222,39 @@ function render(network) {
     }
     order(v1, v2);
   }
-
+  reorder();
   function order(v1,v2) {
-    x.domain(setOrder(v1,v2));
-
+    var indexOrder = setOrder(v1,v2);
+    x.domain(indexOrder);
+    //console.log(setOrder(v1,v2));
     var t = svg.transition().duration(2500);
 
-    t.selectAll(".row")
-        .delay(function(d, i) { return x(i) * 4; })
-        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
+    var tRow = t.selectAll(".row").delay(function(d, i) { return x(i) * 4; })
+        .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; });
+
+    tRow
       .selectAll(".cell")
         .delay(function(d) { return x(d.x) * 4; })
         .attr("x", function(d) { return x(d.x); });
 
-    t.selectAll(".column")
+    tRow.each(function(d,i){
+      d3.select(this).select("text")
+        .text(function() { 
+          return nodes[i].name + ' (' + ( indexOrder.indexOf(i) + 1 ) + ')';
+        });
+    });
+      
+
+    var tColumn = t.selectAll(".column")
         .delay(function(d, i) { return x(i) * 4; })
         .attr("transform", function(d, i) { return "translate(" + x(i) + ")rotate(-90)"; });
+
+    tColumn.each(function(d,i){
+      d3.select(this).select("text")
+        .text(function() { return ( indexOrder.indexOf(i) + 1 ) });
+        
+    });
   }
 
   
-}
-
-// https://tc39.github.io/ecma262/#sec-array.prototype.find
-if (!Array.prototype.find) {
-  Object.defineProperty(Array.prototype, 'find', {
-    value: function(predicate) {
-     // 1. Let O be ? ToObject(this value).
-      if (this == null) {
-        throw new TypeError('"this" is null or not defined');
-      }
-
-      var o = Object(this);
-
-      // 2. Let len be ? ToLength(? Get(O, "length")).
-      var len = o.length >>> 0;
-
-      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-      if (typeof predicate !== 'function') {
-        throw new TypeError('predicate must be a function');
-      }
-
-      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-      var thisArg = arguments[1];
-
-      // 5. Let k be 0.
-      var k = 0;
-
-      // 6. Repeat, while k < len
-      while (k < len) {
-        // a. Let Pk be ! ToString(k).
-        // b. Let kValue be ? Get(O, Pk).
-        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-        // d. If testResult is true, return kValue.
-        var kValue = o[k];
-        if (predicate.call(thisArg, kValue, k, o)) {
-          return kValue;
-        }
-        // e. Increase k by 1.
-        k++;
-      }
-
-      // 7. Return undefined.
-      return undefined;
-    }
-  });
 }
