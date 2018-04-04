@@ -1,7 +1,10 @@
+/* exported arrayFind */
+import { arrayFind } from '../js-exports/polyfills';
+ 
 (function(){
-"use strict"
+"use strict";
 
-  var species = {
+  /*var species = {
     B: "Halibut",
     C: "Sablefish",
     D: "Dungeness crab",
@@ -30,7 +33,7 @@
   var gear = {"1":"PURSE SEINE","2":"VESSEL TO 80'","4":"SET GILLNET","5":"HAND TROLL","6":"LONGLINE VESSEL UNDER 60'","7":"OTTER TRAWL","8":"FISH WHEEL","9":"POT GEAR VESSEL UNDER 60'","10":"RING NET","11":"DIVING GEAR","12":"DIVE/HAND PICK","17":"BEAM TRAWL","18":"SHOVEL","21":"POUND","23":"MECHANICAL DIGGER","25":"DINGLEBAR TROLL","26":"MECHANICAL JIG","34":"GILLNET","37":"PAIR TRAWL","61":"LONGLINE VESSEL 60' OR OVER","77":"GILLNET","91":"POT GEAR VESSEL 60' OR OVER"};
 
   var regions = {"A":"SOUTHEAST","B":"STATEWIDE","D":"YAKUTAT","E":"PRINCE WILLIAM SOUND","J":"WESTWARD","L":"CHIGNIK","M":"ALASKA PENINSULA","Q":"BERING SEA","T":"BRISTOL BAY","X":"KOTZEBUE","H":"COOK INLET","S":"SECURITY COVE","V":"CAPE AVINOF","Z":"NORTON SOUND","K":"KODIAK","O":"DUTCH HARBOR","OA":"ALEUTIAN CDQAPICDA","OB":"ALEUTIAN CDQBBEDC","OC":"ALEUTIAN CDQCBSFA","OD":"ALEUTIAN CDQCVRF","OE":"ALEUTIAN CDQNSEDC","OF":"ALEUTIAN CDQYDFDA","OG":"ALEUTIAN ISLANDS ACAACDC","QA":"BERING SEA CDQAPICDA","QB":"BERING SEA CDQBBEDC","QC":"BERING SEA CDQCBSFA","QD":"BERING SEA CDQCVRF","QE":"BERING SEA CDQNSEDC","QF":"BERING SEA CDQYDFDA","TA":"BRISTOL BAY CDQAPICDA","TB":"BRISTOL BAY CDQBBEDC","TC":"BRISTOL BAY CDQCBSFA","TD":"BRISTOL BAY CDQCVRF","TE":"BRISTOL BAY CDQNSEDC","TF":"BRISTOL BAY CDQYDFDA","ZE":"NORTON SOUND CDQNSEDC","ZF":"NORTON SOUND CDQYDFDA","G":"GOA","AB":"STATEWIDE","AG":"GOA","BB":"STATEWIDE","BG":"GOA","FB":"STATEWIDE","FG":"GOA","GB":"STATEWIDE","GG":"GOA","HB":"STATEWIDE","HG":"GOA","IB":"STATEWIDE","IG":"GOA","F":"ATKA/AMLIA ISLANDS","R":"ADAK","AFW":"FEDERAL WATERS","ASW":"STATE WATERS","BFW":"FEDERAL WATERS","BSW":"STATE WATERS"};
-
+*/
   var margin = {top: 30, right: 0, bottom: 10, left: 60},
       width = 850,
       height = 850;
@@ -38,7 +41,7 @@
   var colors = ['#30653a','#7d4f00','#4e597d','#2a616e','#a3301e','#81447f','#005fa9'];
 
   var x = d3.scaleBand().range([0, width]),
-      y = d3.scaleBand().range([0, height]),
+      //y = d3.scaleBand().range([0, height]),
       z = d3.scalePow().exponent(0.2).domain([0,100]).range([0,1]);
 
 
@@ -83,20 +86,24 @@
 
   var newLinks = [],
   network = {};
-
+  
   function go(){
+    function isMatch(key){
+      return fishNodes.find(function(obj){
+        return obj.name === key;
+      });
+    }
     fishLinks.forEach(function(each,i){
       for (var key in each){
         if ( each.hasOwnProperty(key) ){
-          //console.log(key);
-          let match = fishNodes.find(function(obj){ // find the index of the target
-            return obj.name === key;
-          });
+          console.log(key);
+          let match = isMatch(key);
+          
           let index = match.index;
           if (index !== i && each[key] !== "0" ){ // if source and target are not the same
             newLinks.push({
               source: i,
-              target: index,
+              target: index, 
               value: +each[key]
             });
           }
@@ -158,7 +165,9 @@
         .enter().append("g")
         .attr("class", "row")
         .attr("transform", function(d, i) { return "translate(0," + x(i) + ")"; })
-        .each(row);
+        .each(function(d){
+          rowFn.call(this,d);
+        });
 
     row.append("line")
         .attr("x2", width);
@@ -186,8 +195,9 @@
         .attr("text-anchor", "start")
         .text(function(d, i) { return nodes[i].name; });
 
-    function row(row) {
-      var cell = d3.select(this).selectAll(".cell")
+    function rowFn(row) {
+      /* jshint validthis: true */
+      d3.select(this).selectAll(".cell")
           .data(row.filter(function(d) { return d.z; }))
           .enter().append("rect")
           .attr("class", "cell")
@@ -195,14 +205,14 @@
           .attr("width", x.bandwidth())
           .attr("height", x.bandwidth())
           .style("fill-opacity", function(d) { return z(d.z); })
-          .style("fill", function(d) { return nodes[d.x].cluster == nodes[d.y].cluster ? colors[nodes[d.x].cluster - 1] : '#595959'; })
+          .style("fill", function(d) { return nodes[d.x].cluster === nodes[d.y].cluster ? colors[nodes[d.x].cluster - 1] : '#595959'; })
           .on("mouseover", mouseover) 
           .on("mouseout", mouseout);
     }
 
     function mouseover(p) {
-      d3.selectAll(".row text").classed("active", function(d, i) { return i == p.y; });
-      d3.selectAll(".column text").classed("active", function(d, i) { return i == p.x; });
+      d3.selectAll(".row text").classed("active", function(d, i) { return i === p.y; });
+      d3.selectAll(".column text").classed("active", function(d, i) { return i === p.x; });
     }
 
     function mouseout() {
@@ -254,7 +264,7 @@
 
       tColumn.each(function(d,i){
         d3.select(this).select("text")
-          .text(function() { return ( indexOrder.indexOf(i) + 1 ) });
+          .text(function() { return ( indexOrder.indexOf(i) + 1 ); });
           
       });
     }

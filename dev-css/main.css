@@ -1,0 +1,20 @@
+.background {
+  fill: #eee; }
+
+line {
+  stroke: #fff; }
+
+text.active {
+  fill: black;
+  font-weight: bold; }
+
+text {
+  font-size: 7px;
+  fill: #767676; }
+
+select.has-error {
+  border-color: red;
+  border-width: 2px;
+  opacity: 0.5; }
+
+/*# sourceMappingURL=main.css.map */
