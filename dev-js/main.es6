@@ -39,12 +39,14 @@ import { arrayFind } from '../js-exports/polyfills';
       height = 850;
 
   var colors = ['#30653a','#7d4f00','#4e597d','#2a616e','#a3301e','#81447f','#005fa9'];
+  //var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+  //var colors = d3.range(7).map(d => d3.interpolateRainbow(d/7));
 
   var x = d3.scaleBand().range([0, width]),
       z = d3.scalePow().exponent(0.4).domain([0,1]).range([0.15,1]);
       //z = d3.scaleLinear().domain([0,1]).range([0.2,1]);
       //y = d3.scaleBand().range([0, height]),
-     // z = d3.scalePow().exponent(0.2).domain([0,100]).range([0,1]);
+     // z = d3.scalePow().exponent(0.2).domain([0,100]).range([0,1]);/
       //z = d3.scalePow().exponent(0.2).range([0,1]);
       //z = d3.scaleLinear().
 
@@ -213,7 +215,7 @@ import { arrayFind } from '../js-exports/polyfills';
           .attr("width", x.bandwidth())
           .attr("height", x.bandwidth())
           .style("fill-opacity", function(d) { return z(d.z / Math.min(nodes[d.x].count, nodes[d.y].count)); })
-          .style("fill", function(d) { return nodes[d.x].cluster === nodes[d.y].cluster ? colors[nodes[d.x].cluster - 1] : '#595959'; })
+          .style("fill", function(d) { return nodes[d.x].cluster === nodes[d.y].cluster ? colors[nodes[d.x].cluster] : '#595959'; })
           .on("mouseover", mouseover) 
           .on("mouseout", mouseout);
     }
