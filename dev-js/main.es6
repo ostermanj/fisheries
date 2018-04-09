@@ -55,13 +55,12 @@ import { arrayFind } from '../js-exports/polyfills';
   var fishNodes = null,
       fishLinks = null;
 
-  d3.csv('matrix-headers.csv', function(data){
+  d3.csv('adjacency-cx.csv', function(data){
     console.log(data);
     fishLinks = data;
     goGate();
   });
-  d3.csv('fisheries-nodes.csv', function(data){
-    console.log(data);
+  d3.csv('fisheries-nodes-no-count-no-index.csv', function(data){
     data.forEach(function(each){
       for (var key in each){
         if ( each.hasOwnProperty(key) ){
@@ -72,6 +71,7 @@ import { arrayFind } from '../js-exports/polyfills';
         }
       }
     });
+    //console.log(JSON.stringify(data));
     fishNodes = data;
     goGate();
   });
@@ -99,19 +99,20 @@ import { arrayFind } from '../js-exports/polyfills';
           console.log(key);
           let match = isMatch(key);
           
-          let index = match.index;
-          if (index !== i && each[key] !== "0" ){ // if source and target are not the same
+          let index = fishNodes.indexOf(match);
+         // if (index !== i && each[key] !== "0" ){ // if source and target are not the same
             newLinks.push({
               source: i,
               target: index, 
               value: +each[key]
             });
-          }
+          //}
         }
       }
     }); // end forEach
     network.nodes = fishNodes;
     network.links = newLinks;
+    // console.log(JSON.stringify(network));
     render(network);
   } // end go()
 
@@ -127,15 +128,18 @@ import { arrayFind } from '../js-exports/polyfills';
       node.count = 0;
       matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
     });
-    console.log(matrix);
+   // console.log(matrix);
     // Convert links to matrix; count character occurrences.
     network.links.forEach(function(link) {
-      matrix[link.source][link.target].z += link.value;
-      matrix[link.target][link.source].z += link.value;
-      matrix[link.source][link.source].z += link.value;
-      matrix[link.target][link.target].z += link.value;
-      nodes[link.source].count += link.value;
-      nodes[link.target].count += link.value;
+      matrix[link.source][link.target].z = link.value;
+      matrix[link.target][link.source].z = link.value; 
+      if ( link.target === link.source ) {
+        nodes[link.target].count = link.value;
+      }
+   //   matrix[link.source][link.source].z = nodes[link.source].count;
+   //   matrix[link.target][link.target].z = nodes[link.target].count;
+    //  nodes[link.source].count += link.value;
+    //  nodes[link.target].count += link.value;
     });
 
     console.log(matrix);
