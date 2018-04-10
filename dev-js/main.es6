@@ -35,8 +35,8 @@ import { arrayFind } from '../js-exports/polyfills';
   var regions = {"A":"SOUTHEAST","B":"STATEWIDE","D":"YAKUTAT","E":"PRINCE WILLIAM SOUND","J":"WESTWARD","L":"CHIGNIK","M":"ALASKA PENINSULA","Q":"BERING SEA","T":"BRISTOL BAY","X":"KOTZEBUE","H":"COOK INLET","S":"SECURITY COVE","V":"CAPE AVINOF","Z":"NORTON SOUND","K":"KODIAK","O":"DUTCH HARBOR","OA":"ALEUTIAN CDQAPICDA","OB":"ALEUTIAN CDQBBEDC","OC":"ALEUTIAN CDQCBSFA","OD":"ALEUTIAN CDQCVRF","OE":"ALEUTIAN CDQNSEDC","OF":"ALEUTIAN CDQYDFDA","OG":"ALEUTIAN ISLANDS ACAACDC","QA":"BERING SEA CDQAPICDA","QB":"BERING SEA CDQBBEDC","QC":"BERING SEA CDQCBSFA","QD":"BERING SEA CDQCVRF","QE":"BERING SEA CDQNSEDC","QF":"BERING SEA CDQYDFDA","TA":"BRISTOL BAY CDQAPICDA","TB":"BRISTOL BAY CDQBBEDC","TC":"BRISTOL BAY CDQCBSFA","TD":"BRISTOL BAY CDQCVRF","TE":"BRISTOL BAY CDQNSEDC","TF":"BRISTOL BAY CDQYDFDA","ZE":"NORTON SOUND CDQNSEDC","ZF":"NORTON SOUND CDQYDFDA","G":"GOA","AB":"STATEWIDE","AG":"GOA","BB":"STATEWIDE","BG":"GOA","FB":"STATEWIDE","FG":"GOA","GB":"STATEWIDE","GG":"GOA","HB":"STATEWIDE","HG":"GOA","IB":"STATEWIDE","IG":"GOA","F":"ATKA/AMLIA ISLANDS","R":"ADAK","AFW":"FEDERAL WATERS","ASW":"STATE WATERS","BFW":"FEDERAL WATERS","BSW":"STATE WATERS"};
 */
   var margin = {top: 30, right: 0, bottom: 10, left: 60},
-      width = 850,
-      height = 850;
+      width = 320,
+      height = 320;
 
   var colors = ['#30653a','#7d4f00','#4e597d','#2a616e','#a3301e','#81447f','#005fa9'];
   //var colorScale = d3.scaleOrdinal(d3.schemeCategory20);
@@ -96,7 +96,7 @@ import { arrayFind } from '../js-exports/polyfills';
   function go(){
     function isMatch(key){
       return fishNodes.find(function(obj){
-        return obj.name === key;
+        return obj.id === key;
       });
     }
     fishLinks.forEach(function(each,i){
@@ -187,7 +187,7 @@ import { arrayFind } from '../js-exports/polyfills';
         .attr("y", x.bandwidth() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "end")
-        .text(function(d, i) { return i + '. ' + nodes[i].name; });
+        .text(function(d, i) { return i + '. ' + nodes[i].id; });
 
     var column = svg.selectAll(".column")
         .data(matrix)
@@ -203,7 +203,7 @@ import { arrayFind } from '../js-exports/polyfills';
         .attr("y", x.bandwidth() / 2)
         .attr("dy", ".32em")
         .attr("text-anchor", "start")
-        .text(function(d, i) { return nodes[i].name; });
+        .text(function(d, i) { return nodes[i].id; });
 
     function rowFn(row) {
       /* jshint validthis: true */
@@ -263,7 +263,7 @@ import { arrayFind } from '../js-exports/polyfills';
       tRow.each(function(d,i){
         d3.select(this).select("text")
           .text(function() { 
-            return nodes[i].name + ' (' + ( indexOrder.indexOf(i) + 1 ) + ')';
+            return nodes[i].id + ' (' + ( indexOrder.indexOf(i) + 1 ) + ')';
           });
       });
         
